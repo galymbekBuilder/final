@@ -13,8 +13,8 @@
     --tile:#F2F2F7;
     --bg:#FFFFFF;
 
-    --primary:#145CD8;        /* синие кнопки */
-    --outline-blue:#7EB0FF;   /* обводка вторичной кнопки */
+    --primary:#145CD8;
+    --outline-blue:#7EB0FF;
   }
 
   html,body{
@@ -24,7 +24,6 @@
     -webkit-font-smoothing:antialiased;
   }
 
-  /* Артборд iPhone 15 Pro */
   .phone{
     width:var(--vp-w);
     height:var(--vp-h);
@@ -34,11 +33,9 @@
     overflow:hidden;
   }
 
-  /* Общий шаблон страницы */
   .page{ position:absolute; inset:0; display:none; background:#fff; }
   .page.active{ display:flex; flex-direction:column; overflow:hidden; }
 
-  /* Верхний бар — центрируем заголовок и не даём пересекаться со «стрелкой» */
   .topbar{ position:relative; height:92px; padding-top:18px; flex-shrink:0; }
   .back{
     position:absolute; left:16px; top:44px; width:28px; height:28px;
@@ -49,7 +46,6 @@
     font-weight:700; font-size:20px; line-height:28px; color:var(--text); white-space:nowrap;
   }
 
-  /* Главная */
   .content{ padding:0 24px; display:flex; flex-direction:column; height:calc(100% - 92px); }
   .section-title{ margin:24px 0 14px; font-weight:700; font-size:20px; line-height:26px; color:var(--text); }
   .cell{ height:56px; display:flex; align-items:center; position:relative; }
@@ -62,34 +58,30 @@
     background:#fff; color:#007AFF; font-weight:600; font-size:13.5px; line-height:40px; text-align:center;
   }
 
-  /* Сегмент-контрол навигации (на каждой внутренней странице свой активный пункт) */
   .tabs-wrap{ padding:0 24px; margin-top:6px; flex-shrink:0; }
   .tabs{ height:34px; background:#ECEAEC; border-radius:10px; display:flex; align-items:center; padding:0 4px; }
   .tab{ flex:1; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;
         font-weight:600; font-size:14px; color:#3A3A3C; border:none; background:transparent; }
   .tab.active{ background:#fff; box-shadow:0 0 0 1px #E8E8EA inset; color:#000; }
 
-  /* Страница ДОКУМЕНТ */
   .doc-fill{ flex:1; display:flex; flex-direction:column; }
 
-  /* Белая область для фото документа — без визуальных подсказок */
   .doc-photo-area{
     position:relative;
-    flex:1;                 /* занимает всё свободное пространство между табами и кнопками */
-    overflow:hidden;        /* ничего лишнего не вылазит */
-    /* фон белый как у страницы; без рамок, без текста */
-    cursor:pointer;         /* до загрузки можно нажать, после загрузки уберём */
+    flex:1;
+    overflow:hidden;
+    cursor:pointer;
   }
   .doc-photo-area img{
     width:100%;
     height:100%;
-    object-fit:contain;     /* вписываем фото аккуратно */
-    display:none;           /* покажем после выбора */
+    object-fit:contain;
+    display:none;
   }
   .doc-photo-input{
     position:absolute;
     inset:0;
-    opacity:0;              /* полностью невидим */
+    opacity:0;
   }
 
   .doc-buttons{ margin-top:auto; padding:0 20px 28px; }
@@ -102,7 +94,6 @@
     color:var(--primary); background:#fff; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; font-size:15px;
   }
 
-  /* Контент «Реквизиты» */
   .req-body{ padding:18px 24px 0; flex:1; overflow:hidden; }
   .req-item{ margin-top:18px; }
   .req-caption{ font-size:12.5px; color:#A3A3A3; font-weight:700; letter-spacing:.2px; margin-bottom:6px; }
@@ -147,7 +138,7 @@
       </div>
     </section>
 
-    <!-- УДОСТОВЕРЕНИЕ ЛИЧНОСТИ — СТРАНИЦА: ДОКУМЕНТ -->
+    <!-- УДОСТОВЕРЕНИЕ ЛИЧНОСТИ — ДОКУМЕНТ -->
     <section id="id-doc" class="page" aria-label="Документ">
       <div class="topbar">
         <div class="back" data-goto="home">
@@ -166,9 +157,10 @@
       </div>
 
       <div class="doc-fill">
-        <!-- Белая область: нажми — выбери/сфотографируй документ; после загрузки изменить нельзя -->
+        <!-- Белая зона для загрузки/показа фото документа -->
         <div class="doc-photo-area" id="docPhotoArea" aria-label="Фото документа">
-          <input class="doc-photo-input" id="docFile" type="file" accept="image/*" capture="environment" aria-hidden="true">
+          <!-- ВАЖНО: убран capture, оставлен только accept -->
+          <input class="doc-photo-input" id="docFile" type="file" accept="image/*" aria-hidden="true">
           <img id="docImg" alt="Загруженный документ">
         </div>
 
@@ -196,7 +188,7 @@
       </div>
     </section>
 
-    <!-- УДОСТОВЕРЕНИЕ ЛИЧНОСТИ — СТРАНИЦА: РЕКВИЗИТЫ -->
+    <!-- УДОСТОВЕРЕНИЕ ЛИЧНОСТИ — РЕКВИЗИТЫ -->
     <section id="id-req" class="page" aria-label="Реквизиты">
       <div class="topbar">
         <div class="back" data-goto="home">
@@ -238,7 +230,6 @@
   </div>
 
 <script>
-  /* Масштабируем артборд под ширину устройства, фиксируем высоту — без скролла */
   (function lockSize(){
     const root=document.getElementById('phone');
     function apply(){
@@ -252,7 +243,6 @@
     window.addEventListener('resize',apply,{passive:true});
   })();
 
-  /* Простейший роутер: показываем одну страницу за раз */
   const PAGES=['home','id-doc','id-req'];
   function show(id){
     PAGES.forEach(pid=>{
@@ -262,36 +252,26 @@
       if(pid===id) el.classList.add('active'); else el.classList.remove('active');
     });
   }
-
-  // Стартовая — главная
   show('home');
 
-  // Из главной → страница Документ
   document.getElementById('open-id').addEventListener('click',()=>show('id-doc'));
-
-  // Стрелки «назад» на внутренних страницах → домой
   document.querySelectorAll('.back[data-goto="home"], #id-doc .back, #id-req .back')
     .forEach(b=>b.addEventListener('click',()=>show('home')));
-
-  // Переключение между отдельными страницами «Документ» ↔ «Реквизиты»
   document.getElementById('goto-req').addEventListener('click',()=>show('id-req'));
   document.getElementById('goto-doc').addEventListener('click',()=>show('id-doc'));
 
-  /* Загрузка фото в белую область на странице «Документ» */
+  // Загрузка фото (теперь выбор камера/галерея)
   (function initDocUpload(){
     const area = document.getElementById('docPhotoArea');
     const input = document.getElementById('docFile');
     const img = document.getElementById('docImg');
 
-    // кликом по белой зоне открываем выбор файла
     area.addEventListener('click', openPicker);
     function openPicker(){
-      // если уже загружено — ничего не делаем
       if(!input) return;
       input.click();
     }
 
-    // при выборе файла — показать и навсегда выключить возможность менять
     input.addEventListener('change', function(){
       const file = this.files && this.files[0];
       if(!file) return;
@@ -300,10 +280,10 @@
         img.src = e.target.result;
         img.style.display = 'block';
 
-        // убираем все следы редактирования:
-        area.style.cursor = 'default';      // курсор обычный
-        area.removeEventListener('click', openPicker); // клики больше не работают
-        input.remove();                      // инпут удаляем, заменить нельзя
+        // запрет повторной замены
+        area.style.cursor = 'default';
+        area.removeEventListener('click', openPicker);
+        input.remove();
       };
       reader.readAsDataURL(file);
     });
