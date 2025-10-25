@@ -9,9 +9,11 @@
 <title>Цифровые документы</title>
 <style>
   :root{
+    /* БАЗОВЫЕ РАЗМЕРЫ iPhone 15 Pro (логический вьюпорт) */
     --vp-w: 393px;
     --vp-h: 852px;
 
+    /* Цвета из макета (не меняем) */
     --text:#111111;
     --tile:#F2F2F7;
     --bg:#FFFFFF;
@@ -19,33 +21,36 @@
     --outline-blue:#7EB0FF;
   }
 
-  /* ВНЕШНИЙ ФОН СДЕЛАЛ БЕЛЫМ, ЧТОБЫ НЕ БЫЛО ЧЁРНЫХ ПОЛОС */
+  /* БАЗА: без скролла вообще */
   html, body {
     margin:0; padding:0; height:100%;
-    overflow:hidden;                 /* без прокрутки */
-    background:#FFFFFF;              /* ← белый фон */
+    overflow:hidden;                 /* отключаем прокрутку */
+    background:#ffffff;                 /* только фон под артбордом */
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;
     -webkit-text-size-adjust:100%;
   }
 
+  /* СЦЕНА: фиксируем артборд и масштабируем так, чтобы поместился по ширине и высоте */
   .stage{
-    position:fixed; inset:0;
+    position:fixed; inset:0;         /* растягиваем под окно */
     display:flex; align-items:flex-start; justify-content:center;
-    background:#FFFFFF;              /* ← белый фон вокруг артборда */
   }
 
+  /* АРТБОРД: точные размеры экрана устройства */
   .phone{
     width:var(--vp-w);
     height:var(--vp-h);
     background:var(--bg);
-    overflow:hidden;
-    transform-origin:top center;
+    overflow:hidden;                 /* внутри тоже без прокрутки */
+    transform-origin:top center;     /* масштаб от верхнего края */
   }
 
+  /* Страницы */
   .page{ position:absolute; inset:0; display:none; background:#fff; }
   .page.active{ display:flex; flex-direction:column; overflow:hidden; }
 
+  /* Верхний бар */
   .topbar{ position:relative; height:92px; padding-top:18px; flex-shrink:0; }
   .back{
     position:absolute; left:16px; top:44px; width:28px; height:28px;
@@ -56,6 +61,7 @@
     font-weight:700; font-size:20px; line-height:28px; color:var(--text); white-space:nowrap;
   }
 
+  /* Главная */
   .content{ padding:0 24px; display:flex; flex-direction:column; height:calc(100% - 92px); }
   .section-title{ margin:24px 0 14px; font-weight:700; font-size:20px; line-height:26px; color:var(--text); }
   .cell{ height:56px; display:flex; align-items:center; position:relative; }
@@ -68,6 +74,7 @@
     background:#fff; color:#007AFF; font-weight:600; font-size:13.5px; line-height:40px; text-align:center;
   }
 
+  /* Сегмент переключения (как в макете, без изменений) */
   .tabs-wrap{ padding:0 24px; margin-top:6px; flex-shrink:0; }
   .tabs{ height:34px; background:#ECEAEC; border-radius:10px; display:flex; align-items:center; padding:0 4px; }
   .tab{
@@ -76,25 +83,29 @@
   }
   .tab.active{ background:#fff; box-shadow:0 0 0 1px #E8E8EA inset; color:#000; }
 
+  /* Страница ДОКУМЕНТ */
   .doc-fill{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
+  /* Белая область под фото: занимает всё пространство между табами и кнопками */
   .doc-photo-area{
     position:relative;
-    flex:1;
+    flex:1;                   /* растягивается на оставшуюся высоту */
     overflow:hidden;
-    background:#fff;
+    background:#fff;          /* чистый белый, без рамок, как в макете */
   }
   .doc-photo-area img{
     position:absolute; inset:0;
     width:100%; height:100%;
-    object-fit:contain;
-    display:none;
-    pointer-events:none;
+    object-fit:contain;       /* вписать аккуратно */
+    display:none;             /* показываем после загрузки */
+    pointer-events:none;      /* изображение не кликабельно */
   }
+
+  /* Невидимый input поверх белой зоны (до загрузки) — кликается, но не виден */
   .doc-photo-input{
     position:absolute; inset:0;
     width:100%; height:100%;
-    opacity:0;
+    opacity:0;                /* полностью прозрачен */
     border:0; margin:0; padding:0;
     cursor:pointer;
   }
@@ -109,6 +120,7 @@
     color:var(--primary); background:#fff; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; font-size:15px;
   }
 
+  /* Страница РЕКВИЗИТЫ */
   .req-body{ padding:18px 24px 0; flex:1; overflow:hidden; }
   .req-item{ margin-top:18px; }
   .req-caption{ font-size:12.5px; color:#A3A3A3; font-weight:700; letter-spacing:.2px; margin-bottom:6px; }
@@ -173,6 +185,7 @@
         </div>
 
         <div class="doc-fill">
+          <!-- Белая зона: загрузка фото (сразу поверх вся зона кликабельна) -->
           <div class="doc-photo-area" id="docPhotoArea" aria-label="Фото документа">
             <input class="doc-photo-input" id="docFile" type="file" accept="image/*" aria-hidden="true">
             <img id="docImg" alt="Загруженный документ">
@@ -190,14 +203,14 @@
               Предъявить документ
             </div>
 
-            <button class="outline-btn" id="shareDocBtn" type="button">
+            <div class="outline-btn">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 5.5V16.5" stroke="#1560DC" stroke-width="2" stroke-linecap="round"/>
                 <path d="M8.5 8.5L12 5l3.5 3.5" stroke="#1560DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <rect x="4" y="12" width="16" height="8" rx="2.5" stroke="#1560DC" stroke-width="2"/>
               </svg>
               Отправить документ
-            </button>
+            </div>
           </div>
         </div>
       </section>
@@ -245,22 +258,25 @@
   </div>
 
 <script>
-  /* Вписываем «экран» и по ширине, и по высоте — чёрных полос не будет */
+  /* МАСШТАБИРОВАНИЕ: целиком вписываем артборд и по ширине, и по высоте
+     => ни при каких обстоятельствах скролла не будет */
   (function fitBoard(){
     const phone = document.getElementById('phone');
     function apply(){
       const vw = Math.min(window.innerWidth, document.documentElement.clientWidth);
       const vh = Math.min(window.innerHeight, document.documentElement.clientHeight);
+
       const scaleX = vw / 393;
       const scaleY = vh / 852;
-      const scale = Math.min(scaleX, scaleY);
+      const scale = Math.min(scaleX, scaleY);   // вписываемся и по ширине, и по высоте
+
       phone.style.transform = `scale(${scale})`;
     }
     apply();
     window.addEventListener('resize', apply, {passive:true});
   })();
 
-  /* Роутер */
+  /* РОУТЕР (только показ одной страницы за раз) */
   const PAGES = ['home','id-doc','id-req'];
   function show(id){
     PAGES.forEach(pid=>{
@@ -280,8 +296,11 @@
   document.getElementById('goto-req').addEventListener('click', ()=>show('id-req'));
   document.getElementById('goto-doc').addEventListener('click', ()=>show('id-doc'));
 
-  /* Загрузка фото документа (устойчиво на iOS/Android) */
+  /* ЗАГРУЗКА ФОТО (устойчиво на iOS/Android; без FileReader; без программного клика)
+     — инпут покрывает белую область, поэтому пользователь жмёт прямо на неё.
+     — после успешной загрузки отключаем замену (инпут прячем и блокируем) только ПОСЛЕ onload. */
   (function initDocUpload(){
+    const area = document.getElementById('docPhotoArea');
     const input = document.getElementById('docFile');
     const img = document.getElementById('docImg');
 
@@ -289,58 +308,17 @@
       const file = this.files && this.files[0];
       if(!file) return;
 
-      const blobUrl = URL.createObjectURL(file);
+      const blobUrl = URL.createObjectURL(file);  // надёжнее для iOS
       img.onload = function(){
-        URL.revokeObjectURL(blobUrl);
+        URL.revokeObjectURL(blobUrl);            // чистим ссылку
+        // фиксируем: заменить нельзя
         input.disabled = true;
-        input.style.display = 'none';
+        input.style.display = 'none';            // инпут исчезает
+        // область становится обычной (никаких курсоров/подсказок мы и так не рисовали)
       };
       img.src = blobUrl;
       img.style.display = 'block';
     });
-  })();
-
-  /* Поделиться документом через системное меню (Web Share API) */
-  (function initShareDocument(){
-    const btn = document.getElementById('shareDocBtn');
-    const img = document.getElementById('docImg');
-
-    async function shareDoc(){
-      try{
-        if(!navigator.share){
-          // если браузер не поддерживает share, ничего не ломаем
-          return;
-        }
-
-        // если есть загруженное фото — шарим именно файл
-        if(img && img.src && img.style.display !== 'none'){
-          const resp = await fetch(img.src);
-          const blob = await resp.blob();
-          const name = (blob.type && blob.type.includes('png')) ? 'document.png' : 'document.jpg';
-          const file = new File([blob], name, {type: blob.type || 'image/jpeg'});
-
-          if(navigator.canShare && navigator.canShare({files:[file]})){
-            await navigator.share({
-              files:[file],
-              title:'Документ',
-              text:'Мой документ'
-            });
-            return;
-          }
-        }
-
-        // fallback: просто поделиться ссылкой
-        await navigator.share({
-          title:'Документ',
-          text:'Мой документ',
-          url: location.href
-        });
-      }catch(e){
-        // тихо игнорируем отмену пользователем
-      }
-    }
-
-    btn.addEventListener('click', shareDoc);
   })();
 </script>
 </body>
