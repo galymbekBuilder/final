@@ -69,8 +69,29 @@
         font-weight:600; font-size:14px; color:#3A3A3C; border:none; background:transparent; }
   .tab.active{ background:#fff; box-shadow:0 0 0 1px #E8E8EA inset; color:#000; }
 
-  /* Кнопки внизу страницы ДОКУМЕНТ */
+  /* Страница ДОКУМЕНТ */
   .doc-fill{ flex:1; display:flex; flex-direction:column; }
+
+  /* Белая область для фото документа — без визуальных подсказок */
+  .doc-photo-area{
+    position:relative;
+    flex:1;                 /* занимает всё свободное пространство между табами и кнопками */
+    overflow:hidden;        /* ничего лишнего не вылазит */
+    /* фон белый как у страницы; без рамок, без текста */
+    cursor:pointer;         /* до загрузки можно нажать, после загрузки уберём */
+  }
+  .doc-photo-area img{
+    width:100%;
+    height:100%;
+    object-fit:contain;     /* вписываем фото аккуратно */
+    display:none;           /* покажем после выбора */
+  }
+  .doc-photo-input{
+    position:absolute;
+    inset:0;
+    opacity:0;              /* полностью невидим */
+  }
+
   .doc-buttons{ margin-top:auto; padding:0 20px 28px; }
   .primary-btn{
     height:56px; border-radius:16px; background:var(--primary); color:#fff;
@@ -145,6 +166,12 @@
       </div>
 
       <div class="doc-fill">
+        <!-- Белая область: нажми — выбери/сфотографируй документ; после загрузки изменить нельзя -->
+        <div class="doc-photo-area" id="docPhotoArea" aria-label="Фото документа">
+          <input class="doc-photo-input" id="docFile" type="file" accept="image/*" capture="environment" aria-hidden="true">
+          <img id="docImg" alt="Загруженный документ">
+        </div>
+
         <div class="doc-buttons">
           <div class="primary-btn">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -188,35 +215,12 @@
       </div>
 
       <div class="req-body">
-        <div class="req-item">
-          <div class="req-caption">ФИО</div>
-          <div class="req-value">Аманжан Галымбек Арманулы</div>
-        </div>
-
-        <div class="req-item">
-          <div class="req-caption">ИИН</div>
-          <div class="req-value">031202550128</div>
-        </div>
-
-        <div class="req-item">
-          <div class="req-caption">Дата рождения</div>
-          <div class="req-value">02.12.2003</div>
-        </div>
-
-        <div class="req-item">
-          <div class="req-caption">Номер документа</div>
-          <div class="req-value">060756844</div>
-        </div>
-
-        <div class="req-item">
-          <div class="req-caption">Дата выдачи</div>
-          <div class="req-value">21.12.2019</div>
-        </div>
-
-        <div class="req-item">
-          <div class="req-caption">Срок действия</div>
-          <div class="req-value">20.12.2029</div>
-        </div>
+        <div class="req-item"><div class="req-caption">ФИО</div><div class="req-value">Аманжан Галымбек Арманулы</div></div>
+        <div class="req-item"><div class="req-caption">ИИН</div><div class="req-value">031202550128</div></div>
+        <div class="req-item"><div class="req-caption">Дата рождения</div><div class="req-value">02.12.2003</div></div>
+        <div class="req-item"><div class="req-caption">Номер документа</div><div class="req-value">060756844</div></div>
+        <div class="req-item"><div class="req-caption">Дата выдачи</div><div class="req-value">21.12.2019</div></div>
+        <div class="req-item"><div class="req-caption">Срок действия</div><div class="req-value">20.12.2029</div></div>
       </div>
 
       <div class="send-req">
@@ -272,6 +276,38 @@
   // Переключение между отдельными страницами «Документ» ↔ «Реквизиты»
   document.getElementById('goto-req').addEventListener('click',()=>show('id-req'));
   document.getElementById('goto-doc').addEventListener('click',()=>show('id-doc'));
+
+  /* Загрузка фото в белую область на странице «Документ» */
+  (function initDocUpload(){
+    const area = document.getElementById('docPhotoArea');
+    const input = document.getElementById('docFile');
+    const img = document.getElementById('docImg');
+
+    // кликом по белой зоне открываем выбор файла
+    area.addEventListener('click', openPicker);
+    function openPicker(){
+      // если уже загружено — ничего не делаем
+      if(!input) return;
+      input.click();
+    }
+
+    // при выборе файла — показать и навсегда выключить возможность менять
+    input.addEventListener('change', function(){
+      const file = this.files && this.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e){
+        img.src = e.target.result;
+        img.style.display = 'block';
+
+        // убираем все следы редактирования:
+        area.style.cursor = 'default';      // курсор обычный
+        area.removeEventListener('click', openPicker); // клики больше не работают
+        input.remove();                      // инпут удаляем, заменить нельзя
+      };
+      reader.readAsDataURL(file);
+    });
+  })();
 </script>
 </body>
 </html>
