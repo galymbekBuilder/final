@@ -263,35 +263,39 @@
   // Загрузка фото (теперь выбор камера/галерея)
   // Загрузка фото (теперь выбор камера/галерея)
   // Загрузка фото (исправлено: гарантированно отображает изображение)
+  // Загрузка фото (устойчиво для iOS/Android: ObjectURL + onload)
   (function initDocUpload(){
     const area = document.getElementById('docPhotoArea');
     const input = document.getElementById('docFile');
     const img = document.getElementById('docImg');
 
-    function openPicker(){
-      input.click();
-    }
+    function openPicker(){ input.click(); }
     area.addEventListener('click', openPicker);
 
     input.addEventListener('change', function(){
       const file = this.files && this.files[0];
       if(!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e){
-        // отрисовываем фото
-        img.src = e.target.result;
-        img.style.display = 'block';
+      // создаём временный URL вместо FileReader
+      const blobUrl = URL.createObjectURL(file);
 
-        // запрещаем дальнейшие клики
-        setTimeout(()=>{
-          area.style.cursor = 'default';
-          area.removeEventListener('click', openPicker);
-          input.disabled = true;
-          input.style.display = 'none';
-        }, 100); // небольшая задержка, чтобы браузер успел обновить img
+      // показываем картинку только когда она точно загрузилась в <img>
+      img.onload = function(){
+        // освобождаем URL
+        URL.revokeObjectURL(blobUrl);
+
+        // фиксируем: больше менять нельзя
+        area.style.cursor = 'default';
+        area.removeEventListener('click', openPicker);
+        // не удаляем input до отрисовки — просто отключаем и прячем
+        input.disabled = true;
+        input.style.display = 'none';
       };
-      reader.readAsDataURL(file);
+
+      // назначаем src и гарантированно делаем видимой
+      img.src = blobUrl;
+      // на iOS иногда нужен явный кадр перед сменой display:
+      requestAnimationFrame(()=>{ img.style.display = 'block'; });
     });
   })();
 </script>
