@@ -2,18 +2,13 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Цифровые документы</title>
 <style>
   :root{
-    /* БАЗОВЫЕ РАЗМЕРЫ iPhone 15 Pro (логический вьюпорт) */
-    --vp-w: 393px;
-    --vp-h: 852px;
+    --vp-w:393px;
+    --vp-h:852px;
 
-    /* Цвета из макета (не меняем) */
     --text:#111111;
     --tile:#F2F2F7;
     --bg:#FFFFFF;
@@ -21,111 +16,79 @@
     --outline-blue:#7EB0FF;
   }
 
-  /* БАЗА: без скролла вообще */
-  html, body {
+  html, body{
     margin:0; padding:0; height:100%;
-    overflow:hidden;                 /* отключаем прокрутку */
-    background:#ffffff;                 /* только фон под артбордом */
+    overflow:hidden;
+    background:#ffffff;
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;
     -webkit-text-size-adjust:100%;
   }
 
-  /* СЦЕНА: фиксируем артборд и масштабируем так, чтобы поместился по ширине и высоте */
-  .stage{
-    position:fixed; inset:0;         /* растягиваем под окно */
-    display:flex; align-items:flex-start; justify-content:center;
-  }
-
-  /* АРТБОРД: точные размеры экрана устройства */
+  .stage{ position:fixed; inset:0; display:flex; align-items:flex-start; justify-content:center; }
   .phone{
     width:var(--vp-w);
     height:var(--vp-h);
     background:var(--bg);
-    overflow:hidden;                 /* внутри тоже без прокрутки */
-    transform-origin:top center;     /* масштаб от верхнего края */
+    overflow:hidden;
+    transform-origin:top center;
   }
 
-  /* Страницы */
   .page{ position:absolute; inset:0; display:none; background:#fff; }
   .page.active{ display:flex; flex-direction:column; overflow:hidden; }
 
-  /* Верхний бар */
-  .topbar{ position:relative; height:92px; padding-top:18px; flex-shrink:0; }
-  .back{
-    position:absolute; left:16px; top:44px; width:28px; height:28px;
-    display:flex; align-items:center; justify-content:center;
-  }
+  /* ↓ чуть укоротил верх (просил "поднять") */
+  .topbar{ position:relative; height:82px; padding-top:10px; flex-shrink:0; }
+  .back{ position:absolute; left:16px; top:38px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; }
   .title{
-    position:absolute; top:44px; left:50%; transform:translateX(-50%);
+    position:absolute; top:38px; left:50%; transform:translateX(-50%);
     font-weight:700; font-size:20px; line-height:28px; color:var(--text); white-space:nowrap;
   }
 
-  /* Главная */
-  .content{ padding:0 24px; display:flex; flex-direction:column; height:calc(100% - 92px); }
+  .content{ padding:0 24px; display:flex; flex-direction:column; height:calc(100% - 82px); }
   .section-title{ margin:24px 0 14px; font-weight:700; font-size:20px; line-height:26px; color:var(--text); }
   .cell{ height:56px; display:flex; align-items:center; position:relative; }
-  .icon-wrap{ width:36px; height:36px; border-radius:18px; background:var(--tile);
-    display:flex; align-items:center; justify-content:center; margin-right:12px; }
+  .icon-wrap{ width:36px; height:36px; border-radius:18px; background:var(--tile); display:flex; align-items:center; justify-content:center; margin-right:12px; }
   .cell-title{ font-weight:600; font-size:16px; color:#1C1C1E; }
   .cell .chev{ position:absolute; right:0; width:22px; height:22px; }
-  .refresh{
-    margin-top:22px; width:100%; height:40px; border:1px solid #007AFF; border-radius:8px;
-    background:#fff; color:#007AFF; font-weight:600; font-size:13.5px; line-height:40px; text-align:center;
-  }
+  .refresh{ margin-top:22px; width:100%; height:40px; border:1px solid #007AFF; border-radius:8px; background:#fff; color:#007AFF; font-weight:600; font-size:13.5px; line-height:40px; text-align:center; }
 
-  /* Сегмент переключения (как в макете, без изменений) */
   .tabs-wrap{ padding:0 24px; margin-top:6px; flex-shrink:0; }
   .tabs{ height:34px; background:#ECEAEC; border-radius:10px; display:flex; align-items:center; padding:0 4px; }
-  .tab{
-    flex:1; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;
-    font-weight:600; font-size:14px; color:#3A3A3C; border:none; background:transparent;
-  }
+  .tab{ flex:1; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px; color:#3A3A3C; border:none; background:transparent; }
   .tab.active{ background:#fff; box-shadow:0 0 0 1px #E8E8EA inset; color:#000; }
 
-  /* Страница ДОКУМЕНТ */
   .doc-fill{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
-  /* Белая область под фото: занимает всё пространство между табами и кнопками */
-  .doc-photo-area{
-    position:relative;
-    flex:1;                   /* растягивается на оставшуюся высоту */
-    overflow:hidden;
-    background:#fff;          /* чистый белый, без рамок, как в макете */
-  }
+  .doc-photo-area{ position:relative; flex:1; overflow:hidden; background:#fff; }
   .doc-photo-area img{
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    object-fit:contain;       /* вписать аккуратно */
-    display:none;             /* показываем после загрузки */
-    pointer-events:none;      /* изображение не кликабельно */
+    position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+    display:none;
+    /* после загрузки включим pointer-events, чтобы можно было открыть просмотр */
+    pointer-events:none;
   }
-
-  /* Невидимый input поверх белой зоны (до загрузки) — кликается, но не виден */
-  .doc-photo-input{
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    opacity:0;                /* полностью прозрачен */
-    border:0; margin:0; padding:0;
-    cursor:pointer;
-  }
+  .doc-photo-input{ position:absolute; inset:0; width:100%; height:100%; opacity:0; border:0; margin:0; padding:0; cursor:pointer; }
 
   .doc-buttons{ margin-top:auto; padding:0 20px 28px; }
-  .primary-btn{
-    height:56px; border-radius:16px; background:var(--primary); color:#fff;
-    display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; font-size:15px;
-  }
-  .outline-btn{
-    margin-top:14px; height:56px; border-radius:16px; border:2px solid var(--outline-blue);
-    color:var(--primary); background:#fff; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; font-size:15px;
-  }
+  .primary-btn{ height:56px; border-radius:16px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; font-size:15px; }
+  .outline-btn{ margin-top:14px; height:56px; border-radius:16px; border:2px solid var(--outline-blue); color:var(--primary); background:#fff; display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; font-size:15px; }
 
-  /* Страница РЕКВИЗИТЫ */
   .req-body{ padding:18px 24px 0; flex:1; overflow:hidden; }
   .req-item{ margin-top:18px; }
   .req-caption{ font-size:12.5px; color:#A3A3A3; font-weight:700; letter-spacing:.2px; margin-bottom:6px; }
-  .req-value{ font-size:15px; color:#2A2A2C; font-weight:700; }
+  /* ↓ пункты 2: сделали данные менее жирными */
+  .req-value{ font-size:15px; color:#2A2A2C; font-weight:600; }
+
   .send-req{ margin-top:auto; padding:0 20px 28px; }
+
+  /* Просмотрщик (оверлей) для увеличения фото */
+  .viewer{ position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:9999; }
+  .viewer.show{ display:flex; }
+  .viewer img{
+    max-width:100%; max-height:100%;
+    transform: translate(var(--tx,0px), var(--ty,0px)) scale(var(--scale,1));
+    touch-action:none; /* для кастомного pinch/pan */
+  }
 
   *{ -webkit-tap-highlight-color:transparent; }
 </style>
@@ -138,9 +101,7 @@
       <section id="home" class="page active" aria-label="Главная">
         <div class="topbar">
           <div class="back" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M15.5 4.5L8 12l7.5 7.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5L8 12l7.5 7.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div class="title">Цифровые документы</div>
         </div>
@@ -157,9 +118,7 @@
               </svg>
             </div>
             <div class="cell-title">Удостоверение личности</div>
-            <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M9 4.5L16.5 12 9 19.5" stroke="#B0B0B5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4.5L16.5 12 9 19.5" stroke="#B0B0B5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
 
           <button class="refresh" type="button">Обновить список документов</button>
@@ -169,11 +128,7 @@
       <!-- УДОСТОВЕРЕНИЕ — ДОКУМЕНТ -->
       <section id="id-doc" class="page" aria-label="Документ">
         <div class="topbar">
-          <div class="back" data-goto="home">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M15.5 4.5L8 12l7.5 7.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="back" data-goto="home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5L8 12l7.5 7.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="title">Удостоверение личности</div>
         </div>
 
@@ -185,7 +140,6 @@
         </div>
 
         <div class="doc-fill">
-          <!-- Белая зона: загрузка фото (сразу поверх вся зона кликабельна) -->
           <div class="doc-photo-area" id="docPhotoArea" aria-label="Фото документа">
             <input class="doc-photo-input" id="docFile" type="file" accept="image/*" aria-hidden="true">
             <img id="docImg" alt="Загруженный документ">
@@ -203,7 +157,7 @@
               Предъявить документ
             </div>
 
-            <div class="outline-btn">
+            <div class="outline-btn" id="shareDocBtn">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 5.5V16.5" stroke="#1560DC" stroke-width="2" stroke-linecap="round"/>
                 <path d="M8.5 8.5L12 5l3.5 3.5" stroke="#1560DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -218,11 +172,7 @@
       <!-- УДОСТОВЕРЕНИЕ — РЕКВИЗИТЫ -->
       <section id="id-req" class="page" aria-label="Реквизиты">
         <div class="topbar">
-          <div class="back" data-goto="home">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M15.5 4.5L8 12l7.5 7.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="back" data-goto="home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5L8 12l7.5 7.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="title">Удостоверение личности</div>
         </div>
 
@@ -254,71 +204,145 @@
         </div>
       </section>
 
+      <!-- Просмотрщик (оверлей) -->
+      <div class="viewer" id="viewer">
+        <img id="viewerImg" alt="">
+      </div>
+
     </div>
   </div>
 
 <script>
-  /* МАСШТАБИРОВАНИЕ: целиком вписываем артборд и по ширине, и по высоте
-     => ни при каких обстоятельствах скролла не будет */
+  /* Масштаб как раньше: вписываем и по ширине и по высоте (без скролла) */
   (function fitBoard(){
     const phone = document.getElementById('phone');
     function apply(){
       const vw = Math.min(window.innerWidth, document.documentElement.clientWidth);
       const vh = Math.min(window.innerHeight, document.documentElement.clientHeight);
-
-      const scaleX = vw / 393;
-      const scaleY = vh / 852;
-      const scale = Math.min(scaleX, scaleY);   // вписываемся и по ширине, и по высоте
-
+      const scale = Math.min(vw/393, vh/852);
       phone.style.transform = `scale(${scale})`;
     }
     apply();
     window.addEventListener('resize', apply, {passive:true});
   })();
 
-  /* РОУТЕР (только показ одной страницы за раз) */
-  const PAGES = ['home','id-doc','id-req'];
+  /* Роутер */
+  const PAGES=['home','id-doc','id-req'];
   function show(id){
     PAGES.forEach(pid=>{
-      const el = document.getElementById(pid);
+      const el=document.getElementById(pid);
       if(!el) return;
       const on = pid===id;
-      el.style.display = on ? 'flex' : 'none';
+      el.style.display = on?'flex':'none';
       el.classList.toggle('active', on);
     });
   }
   show('home');
 
-  document.getElementById('open-id').addEventListener('click', ()=>show('id-doc'));
-  document.querySelectorAll('#id-doc .back, #id-req .back').forEach(b=>{
-    b.addEventListener('click', ()=>show('home'));
-  });
-  document.getElementById('goto-req').addEventListener('click', ()=>show('id-req'));
-  document.getElementById('goto-doc').addEventListener('click', ()=>show('id-doc'));
+  document.getElementById('open-id').addEventListener('click',()=>show('id-doc'));
+  document.querySelectorAll('#id-doc .back, #id-req .back').forEach(b=>b.addEventListener('click',()=>show('home')));
+  document.getElementById('goto-req').addEventListener('click',()=>show('id-req'));
+  document.getElementById('goto-doc').addEventListener('click',()=>show('id-doc'));
 
-  /* ЗАГРУЗКА ФОТО (устойчиво на iOS/Android; без FileReader; без программного клика)
-     — инпут покрывает белую область, поэтому пользователь жмёт прямо на неё.
-     — после успешной загрузки отключаем замену (инпут прячем и блокируем) только ПОСЛЕ onload. */
+  /* Загрузка фото документа */
   (function initDocUpload(){
-    const area = document.getElementById('docPhotoArea');
     const input = document.getElementById('docFile');
     const img = document.getElementById('docImg');
 
     input.addEventListener('change', function(){
       const file = this.files && this.files[0];
       if(!file) return;
-
-      const blobUrl = URL.createObjectURL(file);  // надёжнее для iOS
+      const blobUrl = URL.createObjectURL(file);
       img.onload = function(){
-        URL.revokeObjectURL(blobUrl);            // чистим ссылку
-        // фиксируем: заменить нельзя
+        URL.revokeObjectURL(blobUrl);
         input.disabled = true;
-        input.style.display = 'none';            // инпут исчезает
-        // область становится обычной (никаких курсоров/подсказок мы и так не рисовали)
+        input.style.display = 'none';
+        img.style.pointerEvents = 'auto'; // включаем, чтобы открыть просмотр
       };
       img.src = blobUrl;
       img.style.display = 'block';
     });
+  })();
+
+  /* Просмотр и зум фото (оверлей, pinch+pan) */
+  (function viewer(){
+    const triggerImg = document.getElementById('docImg');
+    const viewer = document.getElementById('viewer');
+    const vImg = document.getElementById('viewerImg');
+
+    function openViewer(){
+      if(!triggerImg.src) return;
+      vImg.src = triggerImg.src;
+      viewer.classList.add('show');
+      // сброс трансформаций
+      vImg.style.setProperty('--scale', 1);
+      vImg.style.setProperty('--tx', '0px');
+      vImg.style.setProperty('--ty', '0px');
+      state.scale=1; state.tx=0; state.ty=0;
+    }
+    function closeViewer(){ viewer.classList.remove('show'); }
+
+    triggerImg.addEventListener('click', openViewer);
+    viewer.addEventListener('click', (e)=>{ if(e.target===viewer) closeViewer(); });
+
+    // жесты
+    const state={scale:1, tx:0, ty:0, startScale:1, startDist:0, lastX:0, lastY:0, panning:false};
+
+    function dist(t){ const dx=t[0].clientX - t[1].clientX; const dy=t[0].clientY - t[1].clientY; return Math.hypot(dx,dy); }
+
+    vImg.addEventListener('touchstart', (e)=>{
+      if(e.touches.length===2){
+        state.startDist = dist(e.touches);
+        state.startScale = state.scale;
+      }else if(e.touches.length===1){
+        state.panning = true;
+        state.lastX = e.touches[0].clientX;
+        state.lastY = e.touches[0].clientY;
+      }
+    }, {passive:false});
+
+    vImg.addEventListener('touchmove', (e)=>{
+      if(e.touches.length===2){
+        const s = state.startScale * (dist(e.touches)/state.startDist);
+        state.scale = Math.max(1, Math.min(4, s));
+        vImg.style.setProperty('--scale', state.scale);
+      }else if(state.panning && e.touches.length===1 && state.scale>1){
+        const x = e.touches[0].clientX;
+        const y = e.touches[0].clientY;
+        state.tx += (x - state.lastX);
+        state.ty += (y - state.lastY);
+        state.lastX = x; state.lastY = y;
+        vImg.style.setProperty('--tx', state.tx+'px');
+        vImg.style.setProperty('--ty', state.ty+'px');
+      }
+      e.preventDefault();
+    }, {passive:false});
+
+    vImg.addEventListener('touchend', ()=>{
+      state.panning=false;
+    });
+  })();
+
+  /* Системное «Поделиться» */
+  (function initShare(){
+    const btn = document.getElementById('shareDocBtn');
+    const img = document.getElementById('docImg');
+    async function shareDoc(){
+      try{
+        if(!navigator.share) return;
+        if(img && img.src && img.style.display!=='none'){
+          const resp = await fetch(img.src); const blob = await resp.blob();
+          const name = (blob.type && blob.type.includes('png'))?'document.png':'document.jpg';
+          const file = new File([blob], name, {type:blob.type||'image/jpeg'});
+          if(navigator.canShare && navigator.canShare({files:[file]})){
+            await navigator.share({files:[file], title:'Документ', text:'Мой документ'});
+            return;
+          }
+        }
+        await navigator.share({title:'Документ', text:'Мой документ', url:location.href});
+      }catch(e){/* пользователь мог отменить — игнорируем */}
+    }
+    btn.addEventListener('click', shareDoc);
   })();
 </script>
 </body>
