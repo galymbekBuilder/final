@@ -261,29 +261,35 @@
   document.getElementById('goto-doc').addEventListener('click',()=>show('id-doc'));
 
   // Загрузка фото (теперь выбор камера/галерея)
+  // Загрузка фото (теперь выбор камера/галерея)
+  // Загрузка фото (исправлено: гарантированно отображает изображение)
   (function initDocUpload(){
     const area = document.getElementById('docPhotoArea');
     const input = document.getElementById('docFile');
     const img = document.getElementById('docImg');
 
-    area.addEventListener('click', openPicker);
     function openPicker(){
-      if(!input) return;
       input.click();
     }
+    area.addEventListener('click', openPicker);
 
     input.addEventListener('change', function(){
       const file = this.files && this.files[0];
       if(!file) return;
+
       const reader = new FileReader();
       reader.onload = function(e){
+        // отрисовываем фото
         img.src = e.target.result;
         img.style.display = 'block';
 
-        // запрет повторной замены
-        area.style.cursor = 'default';
-        area.removeEventListener('click', openPicker);
-        input.remove();
+        // запрещаем дальнейшие клики
+        setTimeout(()=>{
+          area.style.cursor = 'default';
+          area.removeEventListener('click', openPicker);
+          input.disabled = true;
+          input.style.display = 'none';
+        }, 100); // небольшая задержка, чтобы браузер успел обновить img
       };
       reader.readAsDataURL(file);
     });
